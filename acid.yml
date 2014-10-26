@@ -1,0 +1,8 @@
+setup:
+    - sudo apt-get update -qq > /dev/null
+    - sudo apt-get install -qq mono-devel > /dev/null
+    - mozroots --import --sync
+env:
+    - EnableNuGetPackageRestore=true
+exec:
+    - xbuild
