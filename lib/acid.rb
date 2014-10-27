@@ -1,9 +1,8 @@
 require 'yaml'
+require 'acid/config'
+require 'acid/executor'
 
 module Acid
-  require 'acid/config'
-  require 'acid/executor'
-
   def self.start(dir)
     Acid::Config.read(File.join(dir, 'acid.yml'))
     printf "Setup:\n\t"; puts Acid::Config.setup.join("\n\t")
