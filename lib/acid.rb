@@ -7,9 +7,10 @@ module Acid
   def self.start(dir)
     config = Acid::Config.new
     config.read(File.join(dir, 'acid.yml'))
-    
-    printf "Setup:\n\t"; puts config.setup.join("\n\t")
-    printf "Environment:\n\t"; puts config.env.join("\n")
-    printf "Build:\n\t"; puts config.exec.join("\n")
+
+    puts "Shell: #{config.shell}" if config.shell != nil
+    (printf "Setup:\n\t";        puts config.setup .join("\n\t")) if config.setup != nil
+    (printf "Environment:\n\t";  puts config.env   .join("\n\t")) if config.env   != nil
+    (printf "Build:\n\t";        puts config.exec  .join("\n\t")) if config.exec  != nil
   end
 end

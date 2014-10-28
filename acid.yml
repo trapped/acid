@@ -1,8 +1,9 @@
 setup:
-    - sudo apt-get update -qq > /dev/null
-    - sudo apt-get install -qq mono-devel > /dev/null
-    - mozroots --import --sync
+    - echo something
 env:
-    - EnableNuGetPackageRestore=true
+    - TEST: test
+    - TESTTEST: testtest
 exec:
-    - xbuild
+    - echo 2
+    - echo %TEST%
+    - echo %TESTTEST%
