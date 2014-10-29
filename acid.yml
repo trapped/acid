@@ -1,8 +1,9 @@
 setup:
     - echo something
+    - echo this is an error >&2 # Should redirect to stderr
 env:
-    - TEST: test
-    - TESTTEST: testtest
+    TEST: test
+    TESTTEST: testtest
 exec:
     - echo 2
     - echo %TEST%
