@@ -10,10 +10,10 @@ class Acid::Executor
 
   # Creates a thread that pipes streams until killed
   def capture(stream_from, stream_to, &filter)
-    return Thread.new {
+    Thread.new {
       while true # TODO: Using waitpid to check if the thread is alive kills it, but just looping like this is dangerous
         r = stream_from.read
-        if filter
+        if filter # yield() syntax is less expensive performance-wise
           r = filter.call(r)
         end
         stream_to.write r
@@ -43,7 +43,7 @@ class Acid::Executor
         puts; puts "Exited with code #{val.exitstatus}".green; puts
         return val.exitstatus
       else
-        puts; puts "Process vanished, exit code unavailable".yellow; puts
+        puts; puts 'Process vanished, exit code unavailable'.yellow; puts
         return -1
       end
     }
