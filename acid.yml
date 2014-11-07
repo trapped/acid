@@ -1,10 +1,10 @@
 setup:
     - echo something
-    - echo this is an error >&2 # Should redirect to stderr
+    - echo this is an error >&2
 env:
     TEST: test
     TESTTEST: testtest
 exec:
     - echo 2
-    - echo %TEST%
+    - echo %TEST% # TODO: Printing *any* env. variable appends '"' (double quote) to it
     - echo %TESTTEST%
