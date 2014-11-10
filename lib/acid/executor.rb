@@ -25,7 +25,7 @@ class Acid::Executor
   def run(command)
     puts "Running '#{command}'...".yellow
     # Capture stdout and stderr separately http://ruby-doc.org/stdlib-2.1.4/libdoc/open3/rdoc/Open3.html#method-c-popen3
-    Open3.popen3(@env, [@shell, command].join(' ')) { |stdin, stdout, stderr, wait_thr|
+    Open3.popen3(@env, [@shell, '"' + command.gsub("'", %q(\\\')).gsub('"', %q(\\\")) + '"'].join(' ')) { |stdin, stdout, stderr, wait_thr|
       puts "Started using #{@shell.split(' ')[0]}, PID is #{wait_thr.pid}".green; puts
       stdin.close # We don't need it and the process might wait for it to close if it needs input
       # Loop while the child process is alive (nonblocking) http://stackoverflow.com/a/14381862/2386865
