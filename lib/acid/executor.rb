@@ -7,35 +7,44 @@ class Acid::Executor
     @env = env
     @shell = shell
   end
+
+  # Creates a thread that pipes streams until killed
+  def capture(stream_from, stream_to, &filter)
+    Thread.new {
+      while true # TODO: Using waitpid to check if the thread is alive kills it, but just looping like this is dangerous
+        r = stream_from.read
+        if filter # yield() syntax is less expensive performance-wise
+          r = filter.call(r)
+        end
+        stream_to.write r
+      end
+    }
+  end
+
   # Executes a single command
   def run(command)
-    puts "Running '#{command}'..."
+    puts "Running '#{command}'...".yellow
     # Capture stdout and stderr separately http://ruby-doc.org/stdlib-2.1.4/libdoc/open3/rdoc/Open3.html#method-c-popen3
-    Open3.popen3(@env, [@shell, command].join(' ')) { |stdin, stdout, stderr, wait_thr|
-      puts "Started using #{@shell.split(' ')[0]}, PID is #{wait_thr.pid}"
+    Open3.popen3(@env, [@shell, '"' + command.gsub("'", %q(\\\')).gsub('"', %q(\\\")) + '"'].join(' ')) { |stdin, stdout, stderr, wait_thr|
+      puts "Started using #{@shell.split(' ')[0]}, PID is #{wait_thr.pid}".green; puts
       stdin.close # We don't need it and the process might wait for it to close if it needs input
       # Loop while the child process is alive (nonblocking) http://stackoverflow.com/a/14381862/2386865
       begin
-        while Process.waitpid(wait_thr.pid, Process::WNOHANG) == nil
-          readable = IO.select([stdout, stderr])[0]
-          readable.each do |stream|
-            if stream == stderr
-              # Print errors in red
-              print stderr.read.to_s.red
-            else
-              print stream.read
-            end
-          end
-        end
+        # Print stdout and stderr to console
+        thr_out = self.capture(stdout, $stdout)
+        thr_err = self.capture(stderr, $stdout) { |text| text.red }
+        wait_thr.join
+        thr_out.kill; thr_err.kill
       rescue Errno::ECHILD, Errno::EINVAL
         # Process exited
       end
       val = wait_thr.value
       if val != nil
-        puts "Exited with code #{val.exitstatus}"
+        puts; puts "Exited with code #{val.exitstatus}".green; puts
+        return val.exitstatus
       else
-        # TODO: Why is the Process::Status returned by wait_thr.value nil? Maybe the process terminated too quickly?
-        puts "Process vanished, exit code unavailable"
+        puts; puts 'Process vanished, exit code unavailable'.yellow; puts
+        return -1
       end
     }
   end

@@ -6,7 +6,7 @@ class Acid::Config
   def shell
     return @shell      if @shell
     return 'cmd /C'    if OS.windows? # TODO: is there any other (better) choice than cmd?
-    return 'rbash -c'  if OS.linux? # Restricted bash (check bash(1) man page)
+    return 'bash -c'   if OS.linux? # Append -r for restricted bash (check bash(1) man page)
     # TODO: OSX/darwin default shell?
     nil
   end

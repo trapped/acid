@@ -1,6 +1,6 @@
 setup:
     - echo something
-    - echo this is an error >&2 # Should redirect to stderr
+    - echo this is an error >&2
 env:
     TEST: test
     TESTTEST: testtest
