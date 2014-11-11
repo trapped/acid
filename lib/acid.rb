@@ -1,26 +1,26 @@
 require 'yaml'
+require 'logger'
 
 module Acid
+  LOG = Logger.new($stdout)
+
   require 'acid/config'
   require 'acid/executor'
 
   def self.start(dir)
+    file = File.join(dir, 'acid.yml')
     config = Acid::Config.new
-    config.read(File.join(dir, 'acid.yml'))
+    config.read(file)
 
-    puts "Shell: #{config.shell}" if config.shell != nil
-    (printf "Setup:\n\t"; puts config.setup .join("\n\t")) if config.setup != nil
-    (puts 'Environment:'; config.env.each { |key, value| puts "\t#{key}: #{value}" }) if config.env != nil
-    (printf "Build:\n\t"; puts config.exec  .join("\n\t")) if config.exec != nil
     # Run setup commands
     if config.setup.length > 0
       setup_executor = Acid::Executor.new(config.env, config.shell)
-      puts "\nExecuting Setup:\n".blue.bold
+      LOG.log(Logger::INFO, "Executing setup for #{file}", 'Acid') if LOG
       config.setup.each { |command|
-        result = setup_executor.run command
+        result = setup_executor.run command, $stdout
         # Command returns failure code, stop
         if result > 0
-          puts "\nCommand exited with #{result}, stopping".red
+          LOG.log(Logger::INFO, "Command exited with #{result}, stopping", 'Acid') if LOG
           exit 1
         end
       }
@@ -28,12 +28,12 @@ module Acid
     # Run exec commands
     if config.exec.length > 0
       exec_executor = Acid::Executor.new(config.env, config.shell)
-      puts "\nExecuting Exec:\n".blue.bold
+      LOG.log(Logger::INFO, "Executing exec for file #{file}", 'Acid') if LOG
       config.exec.each { |command|
-        result = exec_executor.run command
+        result = exec_executor.run command, $stdout
         # Command returns failure code, stop
         if result > 0
-          puts "\nCommand exited with #{result}, stopping".red
+          LOG.log(Logger::INFO, "Command exited with #{result}, stopping", 'Acid') if LOG
           exit 1
         end
       }
