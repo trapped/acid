@@ -1,4 +1,5 @@
 require 'yaml'
+require 'logger'
 require 'helpers/os'
 
 class Acid::Config
@@ -6,8 +7,7 @@ class Acid::Config
   def shell
     return @shell      if @shell
     return 'cmd /C'    if OS.windows? # TODO: is there any other (better) choice than cmd?
-    return 'bash -c'   if OS.linux? # Append -r for restricted bash (check bash(1) man page)
-    # TODO: OSX/darwin default shell?
+    return 'bash -c'   if OS.unix? # Append -r for restricted bash (check bash(1) man page)
     nil
   end
 
@@ -28,6 +28,7 @@ class Acid::Config
 
   # Parses the acid.yml file in the current directory
   def read(path)
+    Acid::LOG.log(Logger::DEBUG, "Reading config file at '#{path}'", 'Acid::Config') if Acid::LOG
     (YAML.load_file path).each { |name, val| instance_variable_set("@#{name}", val) }
   end
 end
