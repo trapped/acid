@@ -24,7 +24,7 @@ class Acid::Executor
   end
 
   # Executes a single command
-  def run(command, output)
+  def run(command, output = $stdout)
     Acid::LOG.log(Logger::DEBUG, "Running '#{command}'...", 'Acid::Executor') if Acid::LOG
     # Capture stdout and stderr separately http://ruby-doc.org/stdlib-2.1.4/libdoc/open3/rdoc/Open3.html#method-c-popen3
     Open3.popen3(@env, [@shell, '"' + command.gsub("'", %q(\\\')).gsub('"', %q(\\\")) + '"'].join(' ')) { |stdin, stdout, stderr, wait_thr|
