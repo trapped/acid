@@ -13,22 +13,22 @@ class Acid::Config
 
   # Commands to execute before building
   def setup
-    @setup ||= nil
+    @setup || nil
   end
 
   # Environmental variables to set before building
   def env
-    @env ||= nil
+    @env || nil
   end
 
   # Commands to execute to build
   def exec
-    @exec ||= nil
+    @exec || nil
   end
 
   # Parses the acid.yml file in the current directory
   def read(path)
-    Acid::LOG.log(Logger::DEBUG, "Reading config file at '#{path}'", 'Acid::Config') if Acid::LOG
+    LOG.info('Acid::Config') { "Reading config file at '#{path}'" }
     (YAML.load_file path).each { |name, val| instance_variable_set("@#{name}", val) }
   end
 end

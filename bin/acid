@@ -8,4 +8,4 @@ $:.unshift File.expand_path('../../lib', Pathname.new(__FILE__))
 require 'acid'
 
 # Start Acid using the current working directory
-Acid::start(Dir.pwd)
+Acid::start(0, Dir.pwd)
