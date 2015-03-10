@@ -20,7 +20,7 @@ module Acid
     config = Acid::Config.new
     config.read(file)
     # Run setup commands
-    if config.setup.length > 0
+    if config.setup && config.setup.length > 0
       setup_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing setup for #{file}" }
       config.setup.each { |command|
@@ -33,7 +33,7 @@ module Acid
       }
     end
     # Run exec commands
-    if config.exec.length > 0
+    if config.exec && config.exec.length > 0
       exec_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing exec for file #{file}" }
       config.exec.each { |command|
