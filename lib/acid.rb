@@ -1,40 +1,47 @@
+require 'acid/config'
+require 'acid/worker'
 require 'yaml'
 require 'logger'
 
+LOG ||= Logger.new($stdout)
+
 module Acid
-  LOG = Logger.new($stdout)
-
-  require 'acid/config'
-  require 'acid/executor'
-
-  def self.start(dir)
-    file = File.join(dir, 'acid.yml')
+  def self.start(id, dir, out = $stdout, cfg = ['acid.yml'])
+    file = ''
+    cfg.each do |name|
+      file = File.join dir, name
+      if File.exist?(file)
+        break
+      end
+    end
+    if file.length == 0
+      return -1
+    end
     config = Acid::Config.new
     config.read(file)
-
     # Run setup commands
     if config.setup.length > 0
-      setup_executor = Acid::Executor.new(config.env, config.shell)
-      LOG.log(Logger::INFO, "Executing setup for #{file}", 'Acid') if LOG
+      setup_worker = Acid::Worker.new(id, config.env, config.shell)
+      LOG.info("Acid##{id}") { "Executing setup for #{file}" }
       config.setup.each { |command|
-        result = setup_executor.run command, $stdout
+        result = setup_worker.run command, out
         # Command returns failure code, stop
         if result > 0
-          LOG.log(Logger::INFO, "Command exited with #{result}, stopping", 'Acid') if LOG
-          exit 1
+          LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
+          return result
         end
       }
     end
     # Run exec commands
     if config.exec.length > 0
-      exec_executor = Acid::Executor.new(config.env, config.shell)
-      LOG.log(Logger::INFO, "Executing exec for file #{file}", 'Acid') if LOG
+      exec_worker = Acid::Worker.new(id, config.env, config.shell)
+      LOG.info("Acid##{id}") { "Executing exec for file #{file}" }
       config.exec.each { |command|
-        result = exec_executor.run command, $stdout
+        result = exec_worker.run command, out
         # Command returns failure code, stop
         if result > 0
-          LOG.log(Logger::INFO, "Command exited with #{result}, stopping", 'Acid') if LOG
-          exit 1
+          LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
+          return result
         end
       }
     end
