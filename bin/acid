@@ -5,6 +5,15 @@ require 'pathname'
 # Add lib directory to $LOAD_PATH
 $:.unshift File.expand_path('../../lib', Pathname.new(__FILE__))
 
+require 'logger'
+
+LOG = Logger.new($stdout)
+if ENV['LOG_LEVEL']
+	LOG.level = eval ENV['LOG_LEVEL']
+else
+	LOG.level = Logger::DEBUG
+end
+
 require 'acid'
 
 # Start Acid using the current working directory
