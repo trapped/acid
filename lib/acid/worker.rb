@@ -2,11 +2,12 @@ require 'open3'
 require 'colorize'
 require 'logger'
 require 'thread'
+require 'pry'
 
 module Acid
   class Worker
   # Creates a new Acid::Worker with the provided environment and shell
-  def initialize(id, env=[], shell)
+  def initialize(id, env = {}, shell)
     @id = id
     @env = env
     @shell = shell
@@ -32,6 +33,9 @@ module Acid
   def run(command, output = $stdout, dir = Dir.pwd)
     LOG.info("Acid::Worker##{@id}") { "Running '#{command}' in '#{dir}'..." }
     output.sync = true
+    if ENV['PRY']
+      binding.pry
+    end
     # Capture stdout and stderr separately http://ruby-doc.org/stdlib-2.1.4/libdoc/open3/rdoc/Open3.html#method-c-popen3
     Open3.popen3(@env, [@shell, '"' + command.gsub("'", %q(\\\')).gsub('"', %q(\\\")) + '"'].join(' '), chdir: dir) { |stdin, stdout, stderr, wait_thr|
     LOG.info("Acid::Worker##{@id}") { "Using #{@shell.split(' ')[0]}, PID is #{wait_thr.pid}" }

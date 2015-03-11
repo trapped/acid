@@ -47,5 +47,6 @@ module Acid
         end
       }
     end
+    return 0
   end
 end

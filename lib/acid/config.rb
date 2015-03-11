@@ -19,7 +19,7 @@ module Acid
 
     # Environmental variables to set before building
     def env
-      @env || nil
+      @env ||= Hash.new # A nil env makes popen3 crash
     end
 
     # Commands to execute to build
