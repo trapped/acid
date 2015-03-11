@@ -6,9 +6,10 @@ require 'logger'
 LOG ||= Logger.new($stdout)
 
 module Acid
-  def self.start(id, dir, out = $stdout, cfg = ['acid.yml'])
+  def self.start(id, dir, out = $stdout, options = {})
+    options = {cfg: ['acid.yml'], prompt: nil}.merge(options)
     file = ''
-    cfg.each do |name|
+    options[:cfg].each do |name|
       if File.exist? File.join(dir, name)
         file = File.join dir, name
         break
@@ -26,7 +27,7 @@ module Acid
       setup_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing setup for #{file}" }
       config.setup.each { |command|
-        result = setup_worker.run command, out, dir
+        result = setup_worker.run command, out, dir, options[:prompt]
         # Command returns failure code, stop
         if result > 0
           LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
@@ -39,7 +40,7 @@ module Acid
       exec_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing exec for file #{file}" }
       config.exec.each { |command|
-        result = exec_worker.run command, out, dir
+        result = exec_worker.run command, out, dir, options[:prompt]
         # Command returns failure code, stop
         if result > 0
           LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
