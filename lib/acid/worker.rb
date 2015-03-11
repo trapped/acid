@@ -17,15 +17,15 @@ module Acid
   def capture(stream_from, stream_to, lock, &filter)
     LOG.info("Acid::Worker##{@id}") { "Starting capture thread (#{stream_from.inspect}->#{stream_to.inspect})" }
     Thread.new {
-    lock.synchronize {
-      while !stream_from.eof? # TODO: Using waitpid to check if the thread is alive might kill it, but just looping is dangerous
-      r = stream_from.read
-      if filter # yield() syntax is less expensive performance-wise
-        r = filter.call(r)
-      end
-      stream_to.write r
-      end
-    }
+      lock.synchronize {
+        while !stream_from.eof? # TODO: Using waitpid to check if the thread is alive might kill it, but just looping is dangerous
+        r = stream_from.read
+        if filter # yield() syntax is less expensive performance-wise
+          r = filter.call(r)
+        end
+        stream_to.write r
+        end
+      }
     }
   end
 
