@@ -26,7 +26,7 @@ module Acid
       setup_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing setup for #{file}" }
       config.setup.each { |command|
-        result = setup_worker.run command, out
+        result = setup_worker.run command, out, dir
         # Command returns failure code, stop
         if result > 0
           LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
@@ -39,7 +39,7 @@ module Acid
       exec_worker = Acid::Worker.new(id, config.env, config.shell)
       LOG.info("Acid##{id}") { "Executing exec for file #{file}" }
       config.exec.each { |command|
-        result = exec_worker.run command, out
+        result = exec_worker.run command, out, dir
         # Command returns failure code, stop
         if result > 0
           LOG.info("Acid##{id}") { "Command exited with #{result}, stopping" }
