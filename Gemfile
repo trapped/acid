@@ -2,8 +2,9 @@ source 'https://rubygems.org'
 
 gemspec
 
+gem 'colorize'
+
 group :development do
-  gem 'colorize'
   gem 'pry'
   gem 'byebug'
 end
