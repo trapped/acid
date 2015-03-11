@@ -9,16 +9,18 @@ module Acid
   def self.start(id, dir, out = $stdout, cfg = ['acid.yml'])
     file = ''
     cfg.each do |name|
-      file = File.join dir, name
-      if File.exist?(file)
+      if File.exist? File.join(dir, name)
+        file = File.join dir, name
         break
       end
     end
-    if file.length == 0
-      return -1
+    if !file || file.empty?
+      return 999
     end
     config = Acid::Config.new
-    config.read(file)
+    if !config.read(file)
+      return 999
+    end
     # Run setup commands
     if config.setup && config.setup.length > 0
       setup_worker = Acid::Worker.new(id, config.env, config.shell)
