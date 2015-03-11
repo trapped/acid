@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name        = 'acid'
-  gem.version     = '0.1'
+  gem.version     = '0.2'
 
   gem.author      = 'trapped'
   gem.email	  = 'giorgio@pellero.it'
