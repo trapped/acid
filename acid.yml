@@ -1,10 +1,15 @@
+#setup:
+#    - echo something
+#    - echo this is an error >&2
+#env:
+#    TEST: test
+#    TESTTEST: testtest
+#exec:
+#    - echo 2
+#    - echo %TEST%
+#    - echo %TESTTEST%
 setup:
-    - echo something
-    - echo this is an error >&2
-env:
-    TEST: test
-    TESTTEST: testtest
+    - bundler install --jobs 4
 exec:
-    - echo 2
-    - echo %TEST%
-    - echo %TESTTEST%
+    - gem build acid.gemspec
+    - gem install acid-*.gem --local
