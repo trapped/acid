@@ -12,4 +12,5 @@ Gem::Specification.new do |gem|
   gem.files       = %x{ git ls-files }.split("\n").select { |d| d =~ %r{^(LICENSE|README|bin/|lib/)} }
 
   gem.add_dependency 'colorize', '~> 0'
+  gem.add_dependency 'pry', '~> 0'
 end
