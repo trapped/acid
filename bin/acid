@@ -17,4 +17,4 @@ end
 require 'acid'
 
 # Start Acid using the current working directory
-Acid::start(0, $stdout, Dir.pwd, ENV['PS1'])
+Acid::start(0, $stdout, Dir.pwd, (ENV['PS1'] || 'acid $ '))
