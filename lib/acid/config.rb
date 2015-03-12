@@ -8,7 +8,7 @@ module Acid
     def shell
       return @shell      if @shell
       return 'cmd /C'    if OS.windows? # TODO: is there any other (better) choice than cmd?
-      return 'bash -c'   if OS.unix? # Append -r for restricted bash (check bash(1) man page)
+      return 'bash -O extglob -c'   if OS.unix? # Append -r for restricted bash (check bash(1) man page)
       nil
     end
 
