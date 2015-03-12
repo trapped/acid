@@ -7,7 +7,7 @@ LOG ||= Logger.new($stdout)
 
 module Acid
   def self.start(id, dir, out = $stdout, options = {})
-    options = {cfg: ['acid.yml'], prompt: nil}.merge(options)
+    options = {cfg: ['acid.yml'], prompt: nil, env: {}}.merge(options)
     file = ''
     options[:cfg].each do |name|
       if File.exist? File.join(dir, name)
@@ -22,6 +22,7 @@ module Acid
     if !config.read(file)
       return 999
     end
+    config.env = config.env.merge({env: {'ACID_PATH' => dir}})
     # Run setup commands
     if config.setup && config.setup.length > 0
       setup_worker = Acid::Worker.new(id, config.env, config.shell)

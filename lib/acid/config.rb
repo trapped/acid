@@ -21,6 +21,9 @@ module Acid
     def env
       @env ||= Hash.new # A nil env makes popen3 crash
     end
+    def env=(val)
+      @env = val
+    end
 
     # Commands to execute to build
     def exec
