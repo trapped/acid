@@ -22,7 +22,7 @@ module Acid
     if !config.read(file)
       return 999
     end
-    config.env = config.env.merge({env: {'ACID_PATH' => dir}})
+    config.env = config.env.merge({'ACID_PATH' => dir})
     # Run setup commands
     if config.setup && config.setup.length > 0
       setup_worker = Acid::Worker.new(id, config.env, config.shell)
