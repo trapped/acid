@@ -11,26 +11,34 @@ module Acid
       @id = id
       @env = env
       @shell = shell
+      @thr_out = nil
+      @thr_err = nil
+      @thr_wait = nil
+    end
+
+    # Kills all the running threads
+    def kill
+      [@thr_out, @thr_err, @thr_wait].each do |t|
+        t.kill if t
+      end
     end
 
     # Creates a thread that pipes streams until killed
     def capture(stream_from, stream_to, lock, &filter)
       LOG.info("Acid::Worker##{@id}") { "Starting capture thread (#{stream_from.inspect}->#{stream_to.inspect})" }
-      Thread.new {
-        lock.synchronize {
-          begin
-            while !stream_from.eof? # TODO: Using waitpid to check if the thread is alive might kill it, but just looping is dangerous
-              r = stream_from.read
-              if filter # yield() syntax is less expensive performance-wise
-                r = filter.call(r)
-              end
-              stream_to.write r
+      lock.synchronize {
+        begin
+          while !stream_from.eof? # TODO: Using waitpid to check if the thread is alive might kill it, but just looping is dangerous
+            r = stream_from.read
+            if filter # yield() syntax is less expensive performance-wise
+              r = filter.call(r)
             end
-          rescue IOError => e
-            LOG.error("Acid::Worker##{@id}") { "IO Error while reading from stream (#{e.message})" }
-            exit # Kill the thread
+            stream_to.write r
           end
-        }
+        rescue IOError => e
+          LOG.error("Acid::Worker##{@id}") { "IO Error while reading from stream (#{e.message})" }
+          exit # Kill the thread
+        end
       }
     end
 
@@ -53,8 +61,8 @@ module Acid
         begin
           locks = { stdout_lock: Mutex.new, stderr_lock: Mutex.new }
           # Print stdout and stderr to console
-          thr_out = self.capture(stdout, output, locks[:stdout_lock])
-          thr_err = self.capture(stderr, output, locks[:stderr_lock]) { |text| text.red }
+          @thr_out = self.capture(stdout, output, locks[:stdout_lock])
+          @thr_err = self.capture(stderr, output, locks[:stderr_lock]) { |text| text.red }
           wait_thr.join
           # Prevent thread death race
           locks.values.each do |lock|
