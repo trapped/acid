@@ -15,13 +15,9 @@ module Acid
         break
       end
     end
-    if !file || file.empty?
-      return 999
-    end
+    return 999 if !file || file.empty?
     config = Acid::Config.new
-    if !config.read(file)
-      return 999
-    end
+    return 999 if !config.read(file)
     config.env = config.env.merge({'ACID_PATH' => dir})
     # Run setup commands
     if config.setup && config.setup.length > 0

@@ -66,7 +66,7 @@ module Acid
           wait_thr.join
           # Prevent thread death race
           locks.values.each do |lock|
-                lock.synchronize {}
+            lock.synchronize {}
           end
           sleep(0.001)
         rescue Errno::ECHILD, Errno::EINVAL
